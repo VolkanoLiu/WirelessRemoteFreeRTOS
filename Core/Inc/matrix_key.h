@@ -24,8 +24,6 @@ typedef struct {
 // 初始化矩阵键盘
 void matrixInit(matrix_key_Typedef *matrix,
     FSMKey_Typedef key[MATRIX_ROW][MATRIX_COL],
-    void (*SingleHit_callback[MATRIX_ROW][MATRIX_COL])(void),
-    void (*DoubleHit_callback[MATRIX_ROW][MATRIX_COL])(void),
     GPIO_struct_Typedef row[MATRIX_ROW],
     GPIO_struct_Typedef col[MATRIX_COL]);
 

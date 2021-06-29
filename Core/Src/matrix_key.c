@@ -14,8 +14,6 @@
   */
 void matrixInit(matrix_key_Typedef *matrix,
     FSMKey_Typedef key[MATRIX_ROW][MATRIX_COL],
-    void (*SingleHit_callback[MATRIX_ROW][MATRIX_COL])(void),
-    void (*DoubleHit_callback[MATRIX_ROW][MATRIX_COL])(void),
     GPIO_struct_Typedef *row,
     GPIO_struct_Typedef *col)
 {
@@ -26,8 +24,6 @@ void matrixInit(matrix_key_Typedef *matrix,
           &key[row_num][col_num],
           (col + col_num)->GPIOx,
           (col + col_num)->GPIO_Pin,
-          SingleHit_callback[row_num][col_num],
-          DoubleHit_callback[row_num][col_num],
           0,
           row_num,
           col_num);

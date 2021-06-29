@@ -165,7 +165,6 @@ void vAS69Task(void* arg)
       byte_count++;
       if (byte_count == 4)
       {
-        // TODO: Send message to somewhere
         Message_TypeDef msg = { 
           .addr = addr,
           .count = count,
@@ -173,11 +172,7 @@ void vAS69Task(void* arg)
         };
         if (xQueueSend(xRecvMessageQueue,
                         (void *) &msg,
-                        (TickType_t) 20 != pdTRUE))
-        {
-          // TODO: Do error check
-        }
-        else
+                        (TickType_t) 20 == pdTRUE))
         {
           xEventGroupSetBits(xReadyEventGroup, BIT_RECV_READY);
         }
@@ -223,9 +218,7 @@ void vDisplayTask(void* arg)
   for (;;)
   {
     xEventGroupWaitBits(xUpdateScreenEventGroup, 0xff, pdTRUE, pdFALSE, portMAX_DELAY);
-    // portENTER_CRITICAL();
     ssd1306_UpdateScreen(hi2c);
-    // portEXIT_CRITICAL();
   }
 }
 
@@ -234,40 +227,6 @@ FSMKey_Typedef keys[4][4];
 void vMatrixTask(void* arg)
 {
   xEventGroupWaitBits(xReadyEventGroup, BIT_SSD1306_READY, pdFALSE, pdTRUE, portMAX_DELAY);
-  void(*SingleHit_callback[4][4])(void);
-  SingleHit_callback[0][0] = NULL;
-  SingleHit_callback[0][1] = NULL;
-  SingleHit_callback[0][2] = NULL;
-  SingleHit_callback[0][3] = NULL;
-  SingleHit_callback[1][0] = NULL;
-  SingleHit_callback[1][1] = NULL;
-  SingleHit_callback[1][2] = NULL;
-  SingleHit_callback[1][3] = NULL;
-  SingleHit_callback[2][0] = NULL;
-  SingleHit_callback[2][1] = NULL;
-  SingleHit_callback[2][2] = NULL;
-  SingleHit_callback[2][3] = NULL;
-  SingleHit_callback[3][0] = NULL;
-  SingleHit_callback[3][1] = NULL;
-  SingleHit_callback[3][2] = NULL;
-  SingleHit_callback[3][3] = NULL;
-  void(*DoubleHit_callback[4][4])(void);
-  DoubleHit_callback[0][0] = NULL;
-  DoubleHit_callback[0][1] = NULL;
-  DoubleHit_callback[0][2] = NULL;
-  DoubleHit_callback[0][3] = NULL;
-  DoubleHit_callback[1][0] = NULL;
-  DoubleHit_callback[1][1] = NULL;
-  DoubleHit_callback[1][2] = NULL;
-  DoubleHit_callback[1][3] = NULL;
-  DoubleHit_callback[2][0] = NULL;
-  DoubleHit_callback[2][1] = NULL;
-  DoubleHit_callback[2][2] = NULL;
-  DoubleHit_callback[2][3] = NULL;
-  DoubleHit_callback[3][0] = NULL;
-  DoubleHit_callback[3][1] = NULL;
-  DoubleHit_callback[3][2] = NULL;
-  DoubleHit_callback[3][3] = NULL;
   GPIO_struct_Typedef row[4];
   GPIO_struct_Typedef col[4];
   row[0].GPIOx = ROW0_GPIO_Port; row[0].GPIO_Pin = ROW0_Pin;
@@ -278,7 +237,7 @@ void vMatrixTask(void* arg)
   col[1].GPIOx = COL1_GPIO_Port; col[1].GPIO_Pin = COL1_Pin;
   col[2].GPIOx = COL2_GPIO_Port; col[2].GPIO_Pin = COL2_Pin;
   col[3].GPIOx = COL3_GPIO_Port; col[3].GPIO_Pin = COL3_Pin;
-  matrixInit(&matrix_key, keys, SingleHit_callback, DoubleHit_callback, row, col);
+  matrixInit(&matrix_key, keys, row, col);
   
   TickType_t xLastWakeTime;
   const TickType_t xFrequency = 4;
@@ -364,7 +323,7 @@ void vGUITask(void* arg)
   }
   GUI_SetProperties(&gmRoot, guiENABLED);
   
-  // TODO
+  /* Render root menu */
   GUI_TypeDef* current_menu = &gmRoot;
   GUI_Render(current_menu);
   xEventGroupSetBits(xReadyEventGroup, BIT_SSD1306_READY);
@@ -374,6 +333,7 @@ void vGUITask(void* arg)
   Message_TypeDef msg;
   for (;;)
   {
+    /* Wait for the gui render bits set and check if the queue is empty */
     uint32_t bits = xEventGroupWaitBits(xReadyEventGroup, BIT_KEY_READY | BIT_RECV_READY, pdFALSE, pdFALSE, portMAX_DELAY);
     if ((bits & BIT_RECV_READY) && xQueueReceive(xRecvMessageQueue, &(msg), portMAX_DELAY) == pdTRUE)
     {
@@ -404,8 +364,6 @@ void vGUITask(void* arg)
     }
   }
 }
-
-//osThreadDef(vAS69Task, osPriorityNormal, 0, 2048);
 
 /* USER CODE END 0 */
 

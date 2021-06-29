@@ -23,16 +23,12 @@ void keyInit(KeyGroup_Typedef *keyGroup,
     FSMKey_Typedef *key,
     GPIO_TypeDef *GPIOx,
     uint16_t GPIO_Pin,
-    void (*singleHit_callback)(void),
-    void (*doubleHit_callback)(void),
     uint8_t polarity,
     uint16_t row,
     uint16_t col)
 {
   key->GPIOx = GPIOx;
   key->GPIO_Pin = GPIO_Pin;
-  key->singleHit_callback = singleHit_callback;
-  key->doubleHit_callback = doubleHit_callback;
   key->polarity = polarity;
   // key->buffer = 0b00000000;
 	key->buffer = 0x0;
